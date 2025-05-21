@@ -1,9 +1,4 @@
-interface QuoteProps {
-  id: number;
-  text: string;
-  author: string;
-  writingYear: number;
-}
+import { type QuoteProps } from "../types/QuoteProps";
 
 function Quote({ id, text, author, writingYear }: QuoteProps) {
   return (
