@@ -5,9 +5,19 @@ import AnimatedRightSlide from "./components/AnimatedRightSlide";
 import { useQuote } from "./hooks/useQuote";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ErrorCard from "./components/ErrorCard";
+import Button from "./components/Button";
 
 function App() {
-  const { data: quote, isLoading, error } = useQuote(1);
+  const {
+    data: quote,
+    isLoading,
+    error,
+    refetch: refetchRandomQuote,
+  } = useQuote();
+
+  const handleGetRandomQuote = () => {
+    refetchRandomQuote();
+  };
 
   return (
     <>
@@ -20,7 +30,7 @@ function App() {
                 Random quote:
               </h1>
               {isLoading ? (
-                <div className="p-5">
+                <div className="m-10 py-5">
                   <LoadingSpinner />
                 </div>
               ) : error ? (
@@ -35,6 +45,7 @@ function App() {
               ) : (
                 <ErrorCard message="Ooops... We haven't found any quote!" />
               )}
+              <Button text="Get random" onClick={handleGetRandomQuote} />
             </AnimatedRightSlide>
           </div>
         </main>
