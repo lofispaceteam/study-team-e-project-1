@@ -2,25 +2,44 @@ import { useState } from "react";
 import Modal from "react-modal";
 import Button from "./Button";
 import { type EditQuoteModalProps } from "../types/EditQuoteModalProps";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateQuote } from "../api/quotesApi";
 
 const EditQuoteModal: React.FC<EditQuoteModalProps> = ({
   isOpen,
   onRequestClose,
   quote,
-  onSave,
+  onSave, // можно оставить для обновления UI локально
 }) => {
   const [text, setText] = useState(quote.text);
   const [author, setAuthor] = useState(quote.author);
-  const [writingYear, setWritingYear] = useState(quote.writingYear);
+  const [writingTime, setWritingTime] = useState(quote.writing_time);
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      updateQuote(quote.id, {
+        id: quote.id,
+        text,
+        author,
+        writing_time: writingTime,
+        creation_time: quote.creation_time,
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["quotes"] });
+      queryClient.invalidateQueries({ queryKey: ["quote", quote.id] });
+      queryClient.invalidateQueries({ queryKey: ["random"] });
+      onSave?.(data);
+      onRequestClose();
+    },
+    onError: (error) => {
+      console.error("Error while updating the qute:", error);
+    },
+  });
 
   const handleSave = () => {
-    onSave({
-      ...quote,
-      text,
-      author,
-      writingYear: Number(writingYear),
-    });
-    onRequestClose();
+    mutation.mutate();
   };
 
   return (
@@ -67,15 +86,18 @@ const EditQuoteModal: React.FC<EditQuoteModalProps> = ({
           </label>
           <input
             type="number"
-            value={writingYear}
-            onChange={(e) => setWritingYear(Number(e.target.value))}
+            value={writingTime}
+            onChange={(e) => setWritingTime(e.target.value)}
             placeholder="Writing year"
             className="w-full text-white border rounded px-3 py-2"
           />
         </div>
 
         <div className="flex justify-between items-center mt-6">
-          <Button text="Save" onClick={handleSave} />
+          <Button
+            text={mutation.isPending ? "Saving..." : "Save"}
+            onClick={handleSave}
+          />
           <Button text="Close" onClick={onRequestClose} />
         </div>
       </div>

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -47,10 +48,19 @@ func main() {
 
 	db.AutoMigrate(&models.Quote{})
 
+
 	quoteRepo := repositories.NewQuoteRepository(db)
 	quoteHandler := handlers.NewQuoteHandler(quoteRepo)
 
 	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
+		AllowCredentials: true,
+	}))
+
 	routes.SetupRoutes(r, quoteHandler)
 
 	port := os.Getenv("PORT")
