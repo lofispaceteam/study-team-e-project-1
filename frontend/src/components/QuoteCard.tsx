@@ -1,7 +1,7 @@
 import { type Quote } from "../types/Quote";
 import AnimatedAppearance from "./AnimatedAppearance";
 
-function QuoteCard({ id, text, author, writingYear }: Quote) {
+function QuoteCard({ id, text, author, writing_time }: Quote) {
   return (
     <AnimatedAppearance>
       <div
@@ -14,9 +14,9 @@ function QuoteCard({ id, text, author, writingYear }: Quote) {
 
         <div className="self-end mt-auto text-right sm:text-xs md:text-xl p-3">
           <p className="font-semibold">
-            {author}, {writingYear}
+            {author}, {writing_time}
           </p>
-          {/* <p className="text-sm">{writingYear}</p> */}
+          {/* <p className="text-sm">{writing_time}</p> */}
         </div>
       </div>
     </AnimatedAppearance>
