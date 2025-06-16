@@ -9,6 +9,8 @@ import ErrorCard from "./components/ErrorCard";
 import Button from "./components/Button";
 import EditQuoteModal from "./components/EditQuoteModal";
 import { type Quote } from "./types/Quote";
+import { useMutation } from "@tanstack/react-query";
+import { deleteQuote } from "./api/quotesApi";
 
 function App() {
   const {
@@ -28,7 +30,20 @@ function App() {
     setChangeQuoteModalIsOpen(!changeQuoteModalIsOpen);
   };
 
-  const handleDeleteQuote = () => {};
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteQuote(id),
+    onSuccess: () => {
+      refetchRandomQuote();
+    },
+    onError: (error) => {
+      console.error("Error while deleting the quote:", error);
+    },
+  });
+
+  const handleDeleteQuote = () => {
+    if (!quote) return;
+    deleteMutation.mutate(quote.id);
+  };
 
   const handleSaveQuote = (updatedQuote: Quote) => {
     console.log("Save:", updatedQuote);
@@ -76,7 +91,10 @@ function App() {
                     text="Change quote"
                     onClick={handleChangeQuote}
                   ></Button>
-                  <Button text="Delete quote"></Button>
+                  <Button
+                    text="Delete quote"
+                    onClick={handleDeleteQuote}
+                  ></Button>
                 </div>
               </div>
             </AnimatedRightSlide>
